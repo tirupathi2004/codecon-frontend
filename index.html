@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CodeCon - Home</title>
+  <style>
+    /* [--- your CSS remains unchanged ---] */
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="challenges.html">Challenges</a>
+      <a href="compiler.html">Compiler</a>
+      <a href="courses.html">Courses</a>
+      <a href="subscription.html">Subscription</a>
+      <a href="profile.html">Profile</a>
+    </div>
+    <a class="login-btn" href="login.html">Login</a>
+  </nav>
+
+  <div class="hero">
+    <h1>Welcome to CodeCon</h1>
+    <p>The ultimate platform for coding challenges, compilers, and interactive online courses. Level up your coding skills now!</p>
+  </div>
+
+  <div class="caption">
+    🚀 Complete challenges and get up to <strong>90% money back</strong> on your course fees!
+  </div>
+
+  <!-- AI Assistant -->
+  <div class="ai-assistant">
+    <div class="ai-chatbox" id="bepo-chat">
+      <p><strong>Bepo:</strong> Ask me about your weak areas, and I’ll recommend challenges & courses!</p>
+      <textarea placeholder="Ask me anything..."></textarea>
+      <button id="ask-bepo">Ask Bepo</button>
+    </div>
+    <div class="ai-icon" id="bepo-icon" title="Talk to Bepo">
+      <div class="eye-container">
+        <div class="eye"><div class="pupil"></div></div>
+        <div class="eye"><div class="pupil"></div></div>
+      </div>
+      <div class="smile"></div>
+    </div>
+  </div>
+
+  <script>
+    const bepoIcon = document.getElementById('bepo-icon');
+    const bepoChat = document.getElementById('bepo-chat');
+    const askButton = document.getElementById('ask-bepo');
+    const textarea = document.querySelector('.ai-chatbox textarea');
+    const pupils = document.querySelectorAll('.pupil');
+
+    bepoIcon.addEventListener('click', () => {
+      bepoChat.style.display = bepoChat.style.display === 'flex' ? 'none' : 'flex';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      const icon = bepoIcon.getBoundingClientRect();
+      const centerX = icon.left + icon.width / 2;
+      const centerY = icon.top + icon.height / 2;
+      const deltaX = (e.clientX - centerX) / 20;
+      const deltaY = (e.clientY - centerY) / 20;
+
+      pupils.forEach(pupil => {
+        pupil.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+      });
+    });
+
+    askButton.addEventListener('click', async () => {
+      const userInput = textarea.value.trim();
+      if (!userInput) return;
+
+      try {
+        const res = await fetch('https://codec-tek5.onrender.com/api/bepo/ask', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ message: userInput })
+        });
+
+        const data = await res.json();
+        alert("Bepo says: " + data.reply);
+      } catch (err) {
+        alert("Something went wrong. Please try again later.");
+      }
+    });
+
+    // 🔗 NEW: Check login status and change "Login" to "Profile" if user is authenticated
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const res = await fetch('https://codec-tek5.onrender.com/api/auth/status', {
+          method: 'GET',
+          credentials: 'include'
+        });
+
+        const data = await res.json();
+        if (res.ok && data.loggedIn) {
+          const loginBtn = document.querySelector('.login-btn');
+          loginBtn.textContent = 'Profile';
+          loginBtn.href = 'profile.html';
+        }
+      } catch (err) {
+        console.warn("Auth check failed:", err);
+      }
+    });
+  </script>
+</body>
+</html>
